@@ -1,0 +1,29 @@
+on:
+  workflow_dispatch:
+  schedule:
+    # runs at 3:30 pm mst (21:30 utc) every day
+    - cron: '30 21 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: set up python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+    - name: install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install google-generativeai gspread oauth2client requests
+        pip install pytz
+    - name: run script
+      env:
+        GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        SHEET_ID: ${{ secrets.SHEET_ID }}
+      run: python main-file.py
